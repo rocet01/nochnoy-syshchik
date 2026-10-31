@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<script src="/sdk.js" async onload="window.__ysdkLoad&&window.__ysdkLoad()"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#111a2c">
 <title>Ночной сыщик — дела без срока давности</title>
@@ -401,10 +402,6 @@ b,strong{font-weight:700}
 <div id="modal" class="overlay"></div>
 <div id="toasts"></div>
 <script>
-/* @vkontakte/vk-bridge 3.0.2, MIT License, (c) VK */
-(()=>{"use strict";let e;var t={};let p="u">typeof window,n=!!(p&&window.AndroidBridge),o=!!(p&&window.webkit?.messageHandlers?.VKWebAppClose),r=!!(p&&window.ReactNativeWebView&&"function"==typeof window.ReactNativeWebView.postMessage),i=p&&!n&&!o,a=i&&/(^\?|&)vk_platform=mobile_web(&|$)/.test(location.search),s=i?"message":"VKWebAppEvent",d=["VKWebAppInit","VKWebAppGetCommunityAuthToken","VKWebAppAddToCommunity","VKWebAppAddToHomeScreenInfo","VKWebAppClose","VKWebAppCopyText","VKWebAppCreateHash","VKWebAppGetUserInfo","VKWebAppSetLocation","VKWebAppSendToClient","VKWebAppGetClientVersion","VKWebAppGetPhoneNumber","VKWebAppGetEmail","VKWebAppGetGroupInfo","VKWebAppGetGeodata","VKWebAppGetCommunityToken","VKWebAppGetConfig","VKWebAppGetLaunchParams","VKWebAppSetTitle","VKWebAppGetAuthToken","VKWebAppCallAPIMethod","VKWebAppJoinGroup","VKWebAppLeaveGroup","VKWebAppAllowMessagesFromGroup","VKWebAppDenyNotifications","VKWebAppAllowNotifications","VKWebAppOpenPayForm","VKWebAppOpenApp","VKWebAppShare","VKWebAppShowWallPostBox","VKWebAppScroll","VKWebAppShowOrderBox","VKWebAppShowLeaderBoardBox","VKWebAppShowInviteBox","VKWebAppShowRequestBox","VKWebAppAddToFavorites","VKWebAppShowStoryBox","VKWebAppStorageGet","VKWebAppStorageGetKeys","VKWebAppStorageSet","VKWebAppFlashGetInfo","VKWebAppSubscribeStoryApp","VKWebAppOpenWallPost","VKWebAppCheckAllowedScopes","VKWebAppCheckBannerAd","VKWebAppHideBannerAd","VKWebAppShowBannerAd","VKWebAppCheckNativeAds","VKWebAppShowNativeAds","VKWebAppRetargetingPixel","VKWebAppConversionHit","VKWebAppShowSubscriptionBox","VKWebAppCheckSurvey","VKWebAppShowSurvey","VKWebAppScrollTop","VKWebAppScrollTopStart","VKWebAppScrollTopStop","VKWebAppShowSlidesSheet","VKWebAppTranslate","VKWebAppRecommend","VKWebAppAddToProfile","VKWebAppGetFriends",...i&&!a?["VKWebAppResizeWindow","VKWebAppAddToMenu","VKWebAppShowInstallPushBox","VKWebAppShowCommunityWidgetPreviewBox","VKWebAppCallStart","VKWebAppCallJoin","VKWebAppCallGetStatus"]:["VKWebAppShowImages"]],A=p?window.AndroidBridge:void 0,b=o?window.webkit.messageHandlers:void 0,l=i?parent:void 0,u=function(t){var p;let a,u,W,V,K=[],c=Math.random().toString(36).substring(2,5);function w(e){K.push(e)}function S(e){return n?!!(A&&"function"==typeof A[e]):o?!!(b?.[e]&&"function"==typeof b[e].postMessage):!!i&&d.includes(e)}function f(){return o||n}function h(){return i&&window.parent!==window}function g(){return f()||h()}function v(e){if(o||n)return[...K].map(t=>t.call(null,e));let t=e?.data;if(!i||!t)return;if(r&&"string"==typeof t)try{t=JSON.parse(t)}catch{}let{type:p,data:s,frameId:d}=t;if(p){if("VKWebAppSettings"===p){a=d;return}[...K].map(e=>e({detail:{type:p,data:s}}))}}r&&/(android)/i.test(navigator.userAgent)?document.addEventListener(s,v):"u">typeof window&&"addEventListener"in window&&window.addEventListener(s,v);let y=(p=function(e,p){A?.[e]?A[e](JSON.stringify(p)):b?.[e]&&"function"==typeof b[e].postMessage?b[e].postMessage?.(p):r?window.ReactNativeWebView.postMessage(JSON.stringify({handler:e,params:p})):l&&"function"==typeof l.postMessage&&l.postMessage({handler:e,params:p,type:"vk-connect",webFrameId:a,connectVersion:t},"*")},u={current:0,next(){return++this.current}},W={},V={add(e,t){let p=null!=t?t:`${u.next()}_${c}`;return W[p]=e,p},resolve(e,t,p){let n=W[e];n&&(p(t)?n.resolve(t):n.reject(t),W[e]=null)}},w(e=>{if(e.detail?.data&&"object"==typeof e.detail.data&&"request_id"in e.detail.data){let{request_id:t,...p}=e.detail.data;t&&V.resolve(t,p,e=>!("error_type"in e))}}),function(e,t={}){return new Promise((n,o)=>{let r=V.add({resolve:n,reject:o},t.request_id);p(e,{...t,request_id:r})})});async function m(t){if(n||o)return S(t);if(e)return e.has(t);try{let t=await y("SetSupportedHandlers");e=new Set(t.supportedHandlers)}catch(t){e=new Set(["VKWebAppInit"])}return e.has(t)}return w(t=>{t.detail&&"SetSupportedHandlers"===t.detail.type&&(e=new Set(t.detail.data.supportedHandlers))}),{send:y,sendPromise:y,subscribe:w,unsubscribe:function(e){let t=K.indexOf(e);t>-1&&K.splice(t,1)},supports:function(e){return console.warn("bridge.supports method is deprecated. Use bridge.supportsAsync instead."),S(e)},supportsAsync:m,isWebView:f,isIframe:h,isEmbedded:g,isStandalone:function(){return!g()}}}("3.0.2");window.vkBridge=window.vkConnect=u;var W=window;for(var V in t)W[V]=t[V];t.__esModule&&Object.defineProperty(W,"__esModule",{value:!0})})();
-</script>
-<script>
 "use strict";
 /* ======================================================================
    НОЧНОЙ СЫЩИК v2 — логические дела, тайловая карта, ночной свет.
@@ -445,7 +442,8 @@ const DEFAULT_SAVE={
   skin:{hat:'fedora_gray',coat:'coat_trench',face:'face_clean'},
   owned:['fedora_gray','coat_gray','coat_trench','face_clean'],
   music:{owned:['noir','tension','jazz_soft'],active:['noir','tension','jazz_soft'],current:'noir'},
-  bonusDone:{},bonusOwned:[],adUnlock:{}
+  bonusDone:{},bonusOwned:[],adUnlock:{},
+  vkMissions:{},vkMissionQueue:[]
 };
 function deepMerge(base,over){
   if(!over||typeof over!=='object')return base;
@@ -692,6 +690,8 @@ function unlockAudio(){
 const PLATFORM='vk';
 /* Куда писать в поддержку (VK требует, чтобы в игре был способ связаться с разработчиком): ссылка на сообщество, страницу или mailto: */
 const SUPPORT_URL='';
+/* URL бэкенда миссий (missions/server). Пустая строка = только локальная отметка, без ленты друзей. */
+const MISSION_API_URL=typeof window!=='undefined'&&window.MISSION_API_URL||'';
 const IN_VK=PLATFORM==='vk'&&!!window.vkBridge&&/[?&]vk_(app_id|platform)=/.test(location.search);
 const AD_CFG={
   interstitial:true,      // полноэкранная реклама между делами (после итогов и перед новым делом)
@@ -728,6 +728,7 @@ window.__ysdkLoad=()=>SDK.init();
 /* ---------- VK Игры: VK Bridge ----------
    Запуск: VKWebAppInit сразу после загрузки. Сворачивание — VKWebAppViewHide/Restore (пауза и тишина).
    Реклама: VKWebAppCheckNativeAds заранее, VKWebAppShowNativeAds — interstitial и reward, баннер VKWebAppShowBannerAd.
+   Уведомления: VKWebAppAllowNotifications (иначе кабинетные пуши неактивным не дойдут).
    Сохранения: VKWebAppStorage (значение до 4096 байт, поэтому сохранение сжимается и режется на куски). */
 const VKP={
   ads:{interstitial:false,reward:false},
@@ -738,11 +739,124 @@ const VKP={
     this.check('interstitial');this.check('reward');
     setInterval(()=>{if(!this.ads.interstitial)this.check('interstitial');if(!this.ads.reward)this.check('reward')},30000);
     CLOUD.initVK();
+    if(this.notifEnabled()){SAVE.flags=SAVE.flags||{};SAVE.flags.notifOn=true}
+    setTimeout(()=>{try{VKM.check();VKM.flushQueue()}catch(e){}},1200);
   },
   check(f){return this.send('VKWebAppCheckNativeAds',{ad_format:f},12000).then(r=>{this.ads[f]=!!(r&&r.result);return this.ads[f]}).catch(()=>false)},
   async show(f){let ok=false;try{if(!this.ads[f]&&!(await this.check(f)))return null;const d=await this.send('VKWebAppShowNativeAds',{ad_format:f},60000);ok=!!(d&&d.result)}catch(e){ok=null}
     this.ads[f]=false;setTimeout(()=>this.check(f),1500);return ok},
-  invite(){this.send('VKWebAppShowInviteBox',{},120000).catch(()=>{})}
+  invite(){this.send('VKWebAppShowInviteBox',{},120000).catch(()=>{})},
+  leaderboard(score){const p={};if(score!=null)p.user_result=Math.max(0,Math.floor(score));this.send('VKWebAppShowLeaderBoardBox',p,60000).catch(()=>{})},
+  /* vk_are_notifications_enabled=1 в launch-параметрах */
+  notifEnabled(){try{return new URLSearchParams(location.search).get('vk_are_notifications_enabled')==='1'}catch(e){return false}},
+  notifOn(){return this.notifEnabled()||!!(SAVE.flags&&SAVE.flags.notifOn)},
+  /* мягкий запрос после первого дела; force=true из настроек */
+  async askNotifications(force){
+    if(PLATFORM!=='vk'||!SDK.vk)return false;
+    if(this.notifEnabled()){SAVE.flags.notifOn=true;save();return true}
+    if(!force&&SAVE.flags&&SAVE.flags.notifAsked)return false;
+    if(!force&&!(SAVE.flags&&SAVE.flags.tutorialDone)&&!(SAVE.solved>=1))return false;
+    try{
+      const r=await this.send('VKWebAppAllowNotifications',{},60000);
+      SAVE.flags.notifAsked=true;
+      const ok=!!(r&&(r.result===true||r.result===1));
+      if(ok){SAVE.flags.notifOn=true;UI.toast('Напомним о деле дня, если не зайдёте','green')}
+      save();return ok;
+    }catch(e){SAVE.flags.notifAsked=true;save();return false}
+  },
+  maybeAskNotifications(){
+    if(PLATFORM!=='vk'||!SDK.vk||this.notifOn()||(SAVE.flags&&SAVE.flags.notifAsked))return;
+    if(!(SAVE.flags&&SAVE.flags.tutorialDone)&&!(SAVE.solved>=1))return;
+    setTimeout(()=>{this.askNotifications(false).catch(()=>{})},1600);
+  }
+};
+/* ---------- VK миссии (лента друзей) ----------
+   Каталог: missions/catalog.json. В кабинете создаёте миссии → получаете activity_id → ids.json.
+   Закрытие миссии на стороне VK: только серверным secure.addAppEvent (missions/server).
+   Клиент проверяет условия, шлёт POST /complete с launch-параметрами. */
+const VKM={
+  defs:[
+    {key:'tutorial',n:'пройти обучение сыщика',pts:20,ck:s=>!!(s.flags&&s.flags.tutorialDone)},
+    {key:'first_case',n:'раскрыть первое дело',pts:35,ck:s=>(s.solved||0)>=1},
+    {key:'ideal',n:'провести блестящее раскрытие',pts:45,ck:s=>(s.ideal||0)>=1},
+    {key:'liar',n:'поймать лжеца на допросе',pts:30,ck:s=>(s.lies||0)>=1},
+    {key:'all_evidence',n:'найти все улики в деле',pts:35,ck:(s,r)=>!!(r&&r.allEv&&r.tier&&r.tier!=='wrong')||!!(s.flags&&s.flags.mission_all_evidence)},
+    {key:'all_rooms',n:'осмотреть все помещения',pts:30,ck:(s,r)=>!!(r&&r.allRooms&&r.tier&&r.tier!=='wrong')||!!(s.flags&&s.flags.mission_all_rooms)},
+    {key:'daily1',n:'раскрыть дело дня',pts:40,ck:s=>!!(s.flags&&s.flags.mission_daily1)},
+    {key:'cases5',n:'раскрыть пять дел',pts:45,ck:s=>(s.solved||0)>=5},
+    {key:'cases10',n:'раскрыть десять дел',pts:55,ck:s=>(s.solved||0)>=10},
+    {key:'cases25',n:'раскрыть двадцать пять дел',pts:70,ck:s=>(s.solved||0)>=25},
+    {key:'cases50',n:'раскрыть пятьдесят дел',pts:90,ck:s=>(s.solved||0)>=50},
+    {key:'daily3',n:'держать серию дел дня три дня',pts:50,ck:s=>(s.dailyStreak||0)>=3},
+    {key:'daily7',n:'держать серию дел дня неделю',pts:75,ck:s=>(s.dailyStreak||0)>=7},
+    {key:'bonus1',n:'раскрыть бонусное дело',pts:40,ck:s=>Object.keys(s.bonusDone||{}).length>=1},
+    {key:'bonus_book',n:'раскрыть все книжные дела',pts:55,ck:s=>typeof bonusCatDone==='function'&&bonusCatDone(s,'book')},
+    {key:'bonus_series',n:'раскрыть все сериальные дела',pts:55,ck:s=>typeof bonusCatDone==='function'&&bonusCatDone(s,'series')},
+    {key:'bonus_all',n:'раскрыть все бонусные дела',pts:100,ck:s=>typeof BONUS!=='undefined'&&BONUS.every(b=>(s.bonusDone||{})[b.id])},
+    {key:'genius',n:'раскрыть дело на сложности Гений',pts:80,ck:(s,r)=>!!(s.flags&&s.flags.mission_genius)||!!(r&&r.tier!=='wrong'&&r.tier!=='weak'&&r.diff==='genius')},
+    {key:'nohint',n:'раскрыть сложное дело без подсказок',pts:70,ck:(s,r)=>!!(s.flags&&s.flags.mission_nohint)||!!(r&&(r.tier==='ideal'||r.tier==='solved')&&r.hints===0&&typeof DIFF_ORDER!=='undefined'&&DIFF_ORDER.indexOf(r.diff)>=3)},
+    {key:'locs8',n:'раскрыть дела в восьми местах',pts:55,ck:s=>Object.keys(s.locs||{}).length>=8},
+    {key:'crimes4',n:'раскрыть все типы преступлений',pts:50,ck:s=>['murder','theft','forgery','sabotage'].every(k=>s.flags&&s.flags['crime_'+k])},
+    {key:'night',n:'раскрыть дело ночной сменой',pts:35,ck:s=>!!(s.flags&&s.flags.nightOwl)},
+    {key:'ideal3',n:'сделать три блестящих раскрытия подряд',pts:65,ck:s=>(s.idealStreak||0)>=3},
+    {key:'score10k',n:'набрать десять тысяч очков',pts:70,ck:s=>(s.score||0)>=10000},
+    {key:'wardrobe',n:'купить вещь в гардеробе',pts:25,ck:s=>{try{return (s.owned||[]).some(id=>{const f=shopItem(id);return f&&f.it[2]>0})}catch(e){return false}}},
+    {key:'music',n:'купить трек для расследования',pts:25,ck:s=>{try{return (s.music.owned||[]).some(id=>findTrack(id).price>0)}catch(e){return false}}}
+  ],
+  points(){const md=SAVE.vkMissions||{};return this.defs.reduce((s,d)=>s+(md[d.key]?d.pts:0),0)},
+  busy:Object.create(null),
+  rememberFlags(r){
+    if(!r)return;
+    if(r.allEv&&r.tier!=='wrong')SAVE.flags.mission_all_evidence=true;
+    if(r.allRooms&&r.tier!=='wrong')SAVE.flags.mission_all_rooms=true;
+    if(r.c&&r.c.mode==='daily'&&r.tier!=='wrong')SAVE.flags.mission_daily1=true;
+    if(r.tier!=='wrong'&&r.tier!=='weak'&&r.diff==='genius')SAVE.flags.mission_genius=true;
+    if((r.tier==='ideal'||r.tier==='solved')&&r.hints===0&&typeof DIFF_ORDER!=='undefined'&&DIFF_ORDER.indexOf(r.diff)>=3)SAVE.flags.mission_nohint=true;
+  },
+  check(r){
+    this.rememberFlags(r);
+    if(!SAVE.vkMissions)SAVE.vkMissions={};
+    let n=0;
+    this.defs.forEach(m=>{
+      if(SAVE.vkMissions[m.key])return;
+      let ok=false;try{ok=!!m.ck(SAVE,r)}catch(e){}
+      if(!ok)return;
+      SAVE.vkMissions[m.key]=Date.now();
+      n++;
+      setTimeout(()=>{SFX.ach&&SFX.ach();UI.toast('Миссия: '+m.n,'green')},350*n);
+      this.send(m.key);
+    });
+    if(n)save();
+  },
+  async send(key){
+    if(!MISSION_API_URL){
+      /* без сервера миссия остаётся локальной — лента друзей не обновится */
+      if(!SAVE.vkMissionQueue)SAVE.vkMissionQueue=[];
+      if(!SAVE.vkMissionQueue.includes(key)){SAVE.vkMissionQueue.push(key);save()}
+      return;
+    }
+    if(this.busy[key])return;this.busy[key]=true;
+    try{
+      const res=await fetch(String(MISSION_API_URL).replace(/\/$/,'')+'/complete',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({key,search:location.search||''})
+      });
+      const data=await res.json().catch(()=>({}));
+      if(data&&data.ok){
+        if(SAVE.vkMissionQueue){SAVE.vkMissionQueue=SAVE.vkMissionQueue.filter(k=>k!==key);save()}
+      }else if(data&&data.error==='mission id not mapped'){
+        if(!SAVE.vkMissionQueue)SAVE.vkMissionQueue=[];
+        if(!SAVE.vkMissionQueue.includes(key)){SAVE.vkMissionQueue.push(key);save()}
+      }
+    }catch(e){
+      if(!SAVE.vkMissionQueue)SAVE.vkMissionQueue=[];
+      if(!SAVE.vkMissionQueue.includes(key)){SAVE.vkMissionQueue.push(key);save()}
+    }finally{this.busy[key]=false}
+  },
+  flushQueue(){
+    const q=(SAVE.vkMissionQueue||[]).slice();
+    q.forEach(k=>this.send(k));
+  }
 };
 /* упаковка сохранения: JSON → deflate → base64 (без CompressionStream — просто base64) */
 const b64e=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
@@ -4646,9 +4760,11 @@ const UI={
   paintShop(){document.querySelectorAll('canvas[data-skin]').forEach(cv=>{const id=cv.dataset.skin,cat=cv.dataset.cat;const old=SAVE.skin[cat];SAVE.skin[cat]=id;const a=playerApp();SAVE.skin[cat]=old;
     const x=cv.getContext('2d');x.clearRect(0,0,32,32);x.fillStyle='#0d1424';x.fillRect(0,0,32,32);x.imageSmoothingEnabled=false;x.drawImage(CHAR.frame(a,'down',0),7,-1)})},
   vSettings(){const s=SAVE.settings;const tg=(k,n)=>`<div class="line"><span>${n}</span><button class="btn sm ${s[k]!==false?'primary':''}" data-act="toggle" data-k="${k}">${s[k]!==false?'Вкл':'Выкл'}</button></div>`;
+    const notifOn=PLATFORM==='vk'&&VKP.notifOn();
     return `<div class="page"><div class="page-head"><button class="btn sm" data-act="menu">Назад</button><h2>Настройки</h2></div><div class="page-body">
       <div class="panel"><h3>Звук</h3>${tg('sound','Звуковые эффекты')}${volRow('sfx','Громкость звуков')}${tg('music','Музыка')}${volRow('music','Громкость музыки')}${tg('rain','Дождь и гром')}</div>
       <div class="panel"><h3>Плейлист</h3><div class="muted" style="margin-bottom:8px">Треки покупаются в гардеробе. Во время дела играют по очереди треки из плейлиста.</div>${MUSIC_TRACKS.filter(t=>ownsMusic(t.id)).map(t=>`<div class="line"><span>${t.name}${SAVE.music.current===t.id?' — играет':''}</span><span style="display:flex;gap:6px"><button class="btn sm" data-act="mtrack" data-id="${t.id}">Включить</button><button class="btn sm ghost" data-act="mtoggle" data-id="${t.id}">${isMusicActive(t.id)?'В плейлисте':'Вне'}</button></span></div>`).join('')}</div>
+      ${PLATFORM==='vk'?`<div class="panel"><h3>ВКонтакте</h3><div class="line"><span>Уведомления о делах</span><button class="btn sm ${notifOn?'primary':''}" data-act="vknotif">${notifOn?'Включены':'Включить'}</button></div><div class="muted" style="margin-top:8px">Напомним про дело дня, если долго не заходили в игру.</div></div>`:''}
       <div class="panel"><h3>Обучение</h3><button class="btn sm" data-act="tutorial">Показать снова</button></div>
       ${SUPPORT_URL?`<div class="panel"><h3>Поддержка</h3><div class="muted" style="margin-bottom:8px">Нашли ошибку или есть идея? Напишите нам — ответим.</div><a class="btn sm" href="${esc(SUPPORT_URL)}" target="_blank" rel="noopener">Написать в поддержку</a></div>`:''}
       <div class="panel"><h3>Прогресс</h3><div class="muted" style="margin-bottom:8px">Удалит очки, монеты, покупки и награды.</div><button class="btn sm danger" data-act="reset">Сбросить всё</button></div></div></div>`},
@@ -4713,7 +4829,7 @@ const ACH=[
 ];
 function bonusCatDone(s,cat){const l=BONUS.filter(b=>b.cat===cat);return l.length>0&&l.every(b=>(s.bonusDone||{})[b.id])}
 for(let i=ACH.length-1;i>=0;i--){const m=/^bonus(Book|Film|Game|Series)$/.exec(ACH[i].id);if(m&&!BONUS.some(b=>b.cat===m[1].toLowerCase()))ACH.splice(i,1)}
-function checkAch(r){let k=0;ACH.forEach(a=>{if(SAVE.ach[a.id])return;let ok=false;try{ok=!!a.ck(SAVE,r)}catch(e){}if(ok){SAVE.ach[a.id]=Date.now();SAVE.score+=100;k++;setTimeout(()=>{SFX.ach();UI.toast('Награда: '+a.n+' (+100)','green')},400*k)}});if(k)save()}
+function checkAch(r){let k=0;ACH.forEach(a=>{if(SAVE.ach[a.id])return;let ok=false;try{ok=!!a.ck(SAVE,r)}catch(e){}if(ok){SAVE.ach[a.id]=Date.now();SAVE.score+=100;k++;setTimeout(()=>{SFX.ach();UI.toast('Награда: '+a.n+' (+100)','green')},400*k)}});if(k)save();if(PLATFORM==='vk')try{VKM.check(r)}catch(e){}}
 const LB_NAME='score';
 const LB={cache:null,t:0,
   submit(e){SAVE.leaderboard=(SAVE.leaderboard||[]).filter(x=>x.name!==e.name);SAVE.leaderboard.push(e);SAVE.leaderboard.sort((a,b)=>b.score-a.score);SAVE.leaderboard=SAVE.leaderboard.slice(0,30);save();this.push()},
@@ -4725,7 +4841,8 @@ const LB={cache:null,t:0,
   async login(){const y=SDK.ready();if(!y||!y.auth)return;
     try{await y.auth.openAuthDialog();CLOUD.player=await y.getPlayer();CLOUD.ready=true;CLOUD.push(true);await this.push();this.t=0;if(STATE.screen==='board')UI.render()}catch(e){}},
   async paint(){const box=$('lbBox');if(!box)return;const y=SDK.ready(),H='<h3>Общий рейтинг сыщиков</h3>';
-    if(PLATFORM==='vk'){box.innerHTML='<h3>Сыщики среди друзей</h3><div class="muted">Позовите друзей в игру и узнайте, кто раскроет больше дел. Ваши очки: <b>'+(SAVE.score||0).toLocaleString('ru-RU')+'</b>.</div>'+(SDK.vk?'<button class="btn sm primary" data-act="vkinvite" style="margin-top:8px">Пригласить друзей</button>':'');return}
+    if(PLATFORM==='vk'){const md=SAVE.vkMissions||{},done=Object.keys(md).length,total=(VKM.defs||[]).length;
+      box.innerHTML='<h3>Сыщики среди друзей</h3><div class="muted">Позовите друзей и копите миссии — их видно в ленте активности. Ваши очки: <b>'+(SAVE.score||0).toLocaleString('ru-RU')+'</b>. Миссии: <b>'+done+'</b> из <b>'+total+'</b>.</div>'+(SDK.vk?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm primary" data-act="vkinvite">Пригласить друзей</button><button class="btn sm" data-act="vkleader">Таблица VK</button></div>':'');return}
     if(!y||!y.leaderboards){box.innerHTML=H+'<div class="muted">Таблица лидеров работает в Яндекс Играх. Ваши очки: <b>'+(SAVE.score||0).toLocaleString('ru-RU')+'</b>.</div>';return}
     box.innerHTML=H+'<div class="muted">Загружаем рейтинг…</div>';
     const r=await this.load();if(!$('lbBox'))return;
@@ -4955,7 +5072,7 @@ document.addEventListener('click',e=>{
     case 'newcase':diffModal();break;
     case 'start':startCase(t.dataset.diff,t.dataset.loc?'bonus':'normal',t.dataset.loc);break;
     case 'bonus':UI.closeModal(true);STATE.screen='bonus';UI.render();break;case 'bonuspick':UI.closeModal(true);if(bonusOwned(t.dataset.id))diffModal(t.dataset.id);else bonusInfo();break;
-    case 'bonustab':STATE.bonusTab=t.dataset.tab;UI.render();break;case 'bonusbuy':buyBonus(t.dataset.id);break;case 'bonusad':adBonus(t.dataset.id);break;case 'vkinvite':VKP.invite();break;case 'lblogin':LB.login();break;
+    case 'bonustab':STATE.bonusTab=t.dataset.tab;UI.render();break;case 'bonusbuy':buyBonus(t.dataset.id);break;case 'bonusad':adBonus(t.dataset.id);break;case 'vkinvite':VKP.invite();break;case 'vkleader':VKP.leaderboard(VKM.points());break;case 'lblogin':LB.login();break;
     case 'double':(async()=>{const r=STATE.result;if(!r||r.doubled||!r.coins)return;const ok=await ADS.rewarded('Удваиваем награду');if(ok){r.doubled=true;SAVE.coins+=r.coins;saveNow();UI.toast('+'+r.coins+' монет','gold');UI.render()}else if(ok===false)UI.toast('Реклама не досмотрена','red')})();break;
     case 'daily':if(SAVE.lastDaily===todayKey())UI.toast('Дело дня уже закрыто. Новое — завтра.','red');else startCase('detective','daily');break;
     case 'quick':startCase('novice','quick');break;
@@ -4980,7 +5097,8 @@ document.addEventListener('click',e=>{
     case 'hint':useHint(t.dataset.k);break;
     case 'adhint':(async()=>{const k=t.dataset.k;const ok=await ADS.rewarded('Реклама за подсказку');if(ok){SAVE.hints[k]=(SAVE.hints[k]||0)+1;save();UI.toast('Подсказка получена','green');if(STATE.nbOpen)UI.renderNb();if(STATE.screen==='scene'&&!STATE.nbOpen)ENG.frozen=false}else if(ok===false)UI.toast('Реклама не досмотрена','red')})();break;
     case 'adcoins':(async()=>{const ok=await ADS.rewarded('Реклама за монеты');if(ok){SAVE.coins+=12;save();UI.toast('+12 монет','gold');UI.render()}})();break;
-    case 'afterresult':(async()=>{const wasB=STATE.result&&STATE.result.c.mode==='bonus';STATE.case=null;STATE.screen=wasB?'bonus':'menu';UI.render();await ADS.interstitial();maybeBonus()})();break;
+    case 'afterresult':(async()=>{const wasB=STATE.result&&STATE.result.c.mode==='bonus';STATE.case=null;STATE.screen=wasB?'bonus':'menu';UI.render();await ADS.interstitial();maybeBonus();try{VKP.maybeAskNotifications()}catch(e){}})();break;
+    case 'vknotif':(async()=>{if(VKP.notifOn()){UI.toast('Уведомления уже включены','green');return}const ok=await VKP.askNotifications(true);if(!ok)UI.toast('Разрешение не выдано — можно включить позже','red');UI.render()})();break;
     case 'shop':STATE.screen='shop';UI.render();break;case 'shoptab':STATE.shopTab=t.dataset.tab;UI.render();break;
     case 'buy':{const f=shopItem(t.dataset.id);if(!f)break;if(SAVE.coins<f.it[2]){UI.toast('Не хватает монет','red');break}SAVE.coins-=f.it[2];SAVE.owned.push(f.it[0]);SAVE.skin[f.cat]=f.it[0];saveNow();SFX.ach();UI.toast('Куплено: '+f.it[1],'green');checkAch();UI.render();break}
     case 'equip':{const f=shopItem(t.dataset.id);if(f&&isOwned(f.it[0])){SAVE.skin[f.cat]=f.it[0];save();UI.render()}break}
