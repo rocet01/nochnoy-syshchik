@@ -764,7 +764,8 @@ const VKP={
   async refreshLaunch(){
     this.captureLaunch();
     try{
-      const d=await this.send('VKWebAppGetLaunchParams',{},8000);
+      const raw=await this.send('VKWebAppGetLaunchParams',{},8000);
+      const d=raw&&typeof raw==='object'?(raw.vk_user_id||raw.sign?raw:(raw.data||raw.result||raw.params||raw)):null;
       if(d&&typeof d==='object'){
         const q=new URLSearchParams();
         Object.keys(d).forEach(k=>{
