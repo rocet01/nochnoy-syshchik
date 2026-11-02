@@ -693,8 +693,8 @@ function unlockAudio(){
 const PLATFORM='vk';
 /* Куда писать в поддержку (VK требует, чтобы в игре был способ связаться с разработчиком): ссылка на сообщество, страницу или mailto: */
 const SUPPORT_URL='';
-/* URL бэкенда миссий (missions/server). Пустая строка = только локальная отметка, без ленты друзей. */
-const MISSION_API_URL=typeof window!=='undefined'&&window.MISSION_API_URL||'';
+/* URL бэкенда миссий (Cloudflare Worker). window.MISSION_API_URL перекрывает дефолт. */
+const MISSION_API_URL=(typeof window!=='undefined'&&window.MISSION_API_URL)||'https://nochnoy-missions.egorgorbunov981.workers.dev';
 const IN_VK=PLATFORM==='vk'&&!!window.vkBridge&&(/[?&]vk_(app_id|platform)=/.test(location.search)||/vk\.com|vk\.ru|ok\.ru/.test(String(document.referrer||'')));
 const AD_CFG={
   interstitial:true,      // полноэкранная реклама между делами (после итогов и перед новым делом)
