@@ -740,9 +740,46 @@ window.__ysdkLoad=()=>SDK.init();
    Сохранения: VKWebAppStorage (значение до 4096 байт, поэтому сохранение сжимается и режется на куски). */
 const VKP={
   ads:{interstitial:false,reward:false},
+  _launch:'',
   send(m,p,ms){return Promise.race([vkBridge.send(m,p||{}),new Promise((_,j)=>setTimeout(()=>j(new Error('timeout '+m)),ms||15000))])},
+  /* Подпись миссий: vk_* + sign. Берём из URL, sessionStorage или Bridge. */
+  captureLaunch(raw){
+    let s=String(raw||'').replace(/^[?#]/,'');
+    if(!s&&typeof location!=='undefined'){
+      s=String(location.search||'').replace(/^\?/,'');
+      if(!/[?&]?(^|&)vk_/.test('&'+s)&&location.hash&&location.hash.includes('vk_'))
+        s=String(location.hash||'').replace(/^#/,'').replace(/^\?/,'');
+    }
+    if(s&&s.includes('vk_')&&s.includes('sign=')){
+      this._launch=s.startsWith('?')?s:'?'+s;
+      try{sessionStorage.setItem('vk_launch',this._launch)}catch(e){}
+    }
+    return this._launch;
+  },
+  launchSearch(){
+    if(this._launch)return this._launch;
+    try{const st=sessionStorage.getItem('vk_launch');if(st){this._launch=st;return st}}catch(e){}
+    return this.captureLaunch()||(typeof location!=='undefined'?location.search||'':'');
+  },
+  async refreshLaunch(){
+    this.captureLaunch();
+    try{
+      const d=await this.send('VKWebAppGetLaunchParams',{},8000);
+      if(d&&typeof d==='object'){
+        const q=new URLSearchParams();
+        Object.keys(d).forEach(k=>{
+          if(k==='sign'||k.startsWith('vk_'))q.set(k,String(d[k]));
+        });
+        const s=q.toString();
+        if(s.includes('vk_')&&s.includes('sign='))this.captureLaunch(s);
+      }
+    }catch(e){}
+    return this.launchSearch();
+  },
   init(){
+    this.captureLaunch();
     this.send('VKWebAppInit',{},8000).catch(()=>{});
+    this.refreshLaunch().catch(()=>{});
     try{vkBridge.subscribe(e=>{const t=e&&e.detail&&e.detail.type;if(t==='VKWebAppViewHide')SDK.pause();else if(t==='VKWebAppViewRestore')SDK.resume()})}catch(e){}
     this.check('interstitial');this.check('reward');
     setInterval(()=>{if(!this.ads.interstitial)this.check('interstitial');if(!this.ads.reward)this.check('reward')},30000);
@@ -756,7 +793,7 @@ const VKP={
   invite(){this.send('VKWebAppShowInviteBox',{},120000).catch(()=>{})},
   leaderboard(score){const p={};if(score!=null)p.user_result=Math.max(0,Math.floor(score));this.send('VKWebAppShowLeaderBoardBox',p,60000).catch(()=>{})},
   /* vk_are_notifications_enabled=1 в launch-параметрах */
-  notifEnabled(){try{return new URLSearchParams(location.search).get('vk_are_notifications_enabled')==='1'}catch(e){return false}},
+  notifEnabled(){try{return new URLSearchParams(this.launchSearch().replace(/^\?/,'')).get('vk_are_notifications_enabled')==='1'}catch(e){return false}},
   notifOn(){return this.notifEnabled()||!!(SAVE.flags&&SAVE.flags.notifOn)},
   /* мягкий запрос после первого дела; force=true из настроек */
   async askNotifications(force){
@@ -808,11 +845,12 @@ const VKM={
     {key:'night',n:'раскрыть дело ночной сменой',pts:35,ck:s=>!!(s.flags&&s.flags.nightOwl)},
     {key:'ideal3',n:'сделать три блестящих раскрытия подряд',pts:65,ck:s=>(s.idealStreak||0)>=3},
     {key:'score10k',n:'набрать десять тысяч очков',pts:70,ck:s=>(s.score||0)>=10000},
-    {key:'wardrobe',n:'купить вещь в гардеробе',pts:25,ck:s=>{try{return (s.owned||[]).some(id=>{const f=shopItem(id);return f&&f.it[2]>0})}catch(e){return false}}},
-    {key:'music',n:'купить трек для расследования',pts:25,ck:s=>{try{return (s.music.owned||[]).some(id=>findTrack(id).price>0)}catch(e){return false}}}
+    {key:'wardrobe',n:'купить вещь в гардеробе',pts:25,ck:s=>{try{return !!(s.flags&&s.flags.boughtPaidSkin)||(s.owned||[]).some(id=>{const f=shopItem(id);return f&&f.it[2]>0})}catch(e){return false}}},
+    {key:'music',n:'купить трек для расследования',pts:25,ck:s=>{try{return !!(s.flags&&s.flags.boughtPaidTrack)||(s.music.owned||[]).some(id=>findTrack(id).price>0)}catch(e){return false}}}
   ],
   points(){const md=SAVE.vkMissions||{};return this.defs.reduce((s,d)=>s+(md[d.key]?d.pts:0),0)},
   busy:Object.create(null),
+  _errToast:0,
   rememberFlags(r){
     if(!r)return;
     if(r.allEv&&r.tier!=='wrong')SAVE.flags.mission_all_evidence=true;
@@ -824,9 +862,13 @@ const VKM={
   check(r){
     this.rememberFlags(r);
     if(!SAVE.vkMissions)SAVE.vkMissions={};
+    if(!SAVE.vkMissionSent)SAVE.vkMissionSent={};
     let n=0;
     this.defs.forEach(m=>{
-      if(SAVE.vkMissions[m.key])return;
+      if(SAVE.vkMissions[m.key]){
+        if(!SAVE.vkMissionSent[m.key])this.send(m.key);
+        return;
+      }
       let ok=false;try{ok=!!m.ck(SAVE,r)}catch(e){}
       if(!ok)return;
       SAVE.vkMissions[m.key]=Date.now();
@@ -836,34 +878,53 @@ const VKM={
     });
     if(n)save();
   },
+  queue(key){
+    if(!SAVE.vkMissionQueue)SAVE.vkMissionQueue=[];
+    if(!SAVE.vkMissionQueue.includes(key)){SAVE.vkMissionQueue.push(key);save()}
+  },
   async send(key){
-    if(!MISSION_API_URL){
-      /* без сервера миссия остаётся локальной — лента друзей не обновится */
-      if(!SAVE.vkMissionQueue)SAVE.vkMissionQueue=[];
-      if(!SAVE.vkMissionQueue.includes(key)){SAVE.vkMissionQueue.push(key);save()}
-      return;
-    }
+    if(!MISSION_API_URL){this.queue(key);return}
     if(this.busy[key])return;this.busy[key]=true;
     try{
+      if(typeof VKP!=='undefined'&&VKP.refreshLaunch)await VKP.refreshLaunch().catch(()=>{});
+      const search=(typeof VKP!=='undefined'&&VKP.launchSearch)?VKP.launchSearch():(location.search||'');
       const res=await fetch(String(MISSION_API_URL).replace(/\/$/,'')+'/complete',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({key,search:location.search||''})
+        body:JSON.stringify({key,search})
       });
       const data=await res.json().catch(()=>({}));
       if(data&&data.ok){
-        if(SAVE.vkMissionQueue){SAVE.vkMissionQueue=SAVE.vkMissionQueue.filter(k=>k!==key);save()}
-      }else if(data&&data.error==='mission id not mapped'){
-        if(!SAVE.vkMissionQueue)SAVE.vkMissionQueue=[];
-        if(!SAVE.vkMissionQueue.includes(key)){SAVE.vkMissionQueue.push(key);save()}
+        if(!SAVE.vkMissionSent)SAVE.vkMissionSent={};
+        SAVE.vkMissionSent[key]=Date.now();
+        SAVE.flags=SAVE.flags||{};
+        SAVE.flags.vkMissionLast='ok:'+key+(data.already?' (уже была)':'');
+        if(SAVE.vkMissionQueue)SAVE.vkMissionQueue=SAVE.vkMissionQueue.filter(k=>k!==key);
+        save();
+        try{UI.toast('В ленту VK: '+key+(data.already?' (уже была)':''),'green')}catch(e){}
+      }else{
+        this.queue(key);
+        const err=(data&&data.error);
+        const errTxt=typeof err==='object'?(err.error_msg||JSON.stringify(err)):String(err||res.status);
+        SAVE.flags=SAVE.flags||{};
+        SAVE.flags.vkMissionLast='err:'+errTxt;
+        save();
+        const now=Date.now();
+        if(now-this._errToast>12000){
+          this._errToast=now;
+          try{UI.toast('VK миссия не ушла: '+errTxt,'red')}catch(e){}
+        }
       }
     }catch(e){
-      if(!SAVE.vkMissionQueue)SAVE.vkMissionQueue=[];
-      if(!SAVE.vkMissionQueue.includes(key)){SAVE.vkMissionQueue.push(key);save()}
-    }finally{this.busy[key]=false}
+      this.queue(key);
+      SAVE.flags=SAVE.flags||{};SAVE.flags.vkMissionLast='err:'+String(e&&e.message||e);save();
+      try{UI.toast('VK миссия: сеть/Worker','red')}catch(e2){}
+    }
+    finally{this.busy[key]=false}
   },
   flushQueue(){
-    const q=(SAVE.vkMissionQueue||[]).slice();
-    q.forEach(k=>this.send(k));
+    const q=new Set(SAVE.vkMissionQueue||[]);
+    Object.keys(SAVE.vkMissions||{}).forEach(k=>{if(!(SAVE.vkMissionSent||{})[k])q.add(k)});
+    [...q].forEach(k=>this.send(k));
   }
 };
 /* упаковка сохранения: JSON → deflate → base64 (без CompressionStream — просто base64) */
@@ -4825,7 +4886,7 @@ const ACH=[
   {id:'bonus10',ic:'dice',n:'Азарт',d:'Сыграть 10 бонусных игр.',ck:s=>s.bonuses>=10},
   {id:'tutorial',ic:'book',n:'Ученик',d:'Пройти обучение.',ck:s=>s.flags.tutorialDone},
   {id:'vercheck',ic:'scale',n:'Аналитик',d:'Проверить версию перед обвинением.',ck:s=>s.flags.vercheck},
-  {id:'shop',ic:'coin',n:'Модник',d:'Купить вещь в гардеробе.',ck:s=>(s.owned||[]).some(id=>{const f=shopItem(id);return f&&f.it[2]>0})},
+  {id:'shop',ic:'coin',n:'Модник',d:'Купить вещь в гардеробе.',ck:s=>!!(s.flags&&s.flags.boughtPaidSkin)||(s.owned||[]).some(id=>{const f=shopItem(id);return f&&f.it[2]>0})},
   {id:'music',ic:'music',n:'Меломан',d:'Купить трек.',ck:s=>s.music.owned.some(id=>findTrack(id).price>0)},
   {id:'night',ic:'clock',n:'Ночная смена',d:'Раскрыть дело между полуночью и пятью утра.',ck:s=>s.flags.nightOwl},
   {id:'bonus1',ic:'book',n:'Любитель историй',d:'Раскрыть первое бонусное дело.',ck:s=>Object.keys(s.bonusDone||{}).length>=1},
@@ -4849,8 +4910,8 @@ const LB={cache:null,t:0,
   async login(){const y=SDK.ready();if(!y||!y.auth)return;
     try{await y.auth.openAuthDialog();CLOUD.player=await y.getPlayer();CLOUD.ready=true;CLOUD.push(true);await this.push();this.t=0;if(STATE.screen==='board')UI.render()}catch(e){}},
   async paint(){const box=$('lbBox');if(!box)return;const y=SDK.ready(),H='<h3>Общий рейтинг сыщиков</h3>';
-    if(PLATFORM==='vk'){const md=SAVE.vkMissions||{},done=Object.keys(md).length,total=(VKM.defs||[]).length;
-      box.innerHTML='<h3>Сыщики среди друзей</h3><div class="muted">Позовите друзей и копите миссии — их видно в ленте активности. Ваши очки: <b>'+(SAVE.score||0).toLocaleString('ru-RU')+'</b>. Миссии: <b>'+done+'</b> из <b>'+total+'</b>.</div>'+(SDK.vk?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm primary" data-act="vkinvite">Пригласить друзей</button><button class="btn sm" data-act="vkleader">Таблица VK</button></div>':'');return}
+    if(PLATFORM==='vk'){const md=SAVE.vkMissions||{},sent=SAVE.vkMissionSent||{},done=Object.keys(md).length,synced=Object.keys(sent).length,total=(VKM.defs||[]).length,last=(SAVE.flags&&SAVE.flags.vkMissionLast)||'—';
+      box.innerHTML='<h3>Сыщики среди друзей</h3><div class="muted">Лента друзей — не колокольчик «Уведомления», а раздел <b>Игры</b> (на телефоне) или <b>Игры → Профиль → Уведомления</b> (на сайте). В игре миссии: <b>'+done+'</b> из <b>'+total+'</b>. Ушло в VK: <b>'+synced+'</b>. Последняя отправка: <b>'+esc(String(last))+'</b>.</div>'+(SDK.vk?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm primary" data-act="vkinvite">Пригласить друзей</button><button class="btn sm" data-act="vkleader">Таблица VK</button><button class="btn sm" data-act="vkresync">Переслать в VK</button></div>':'<div class="muted" style="margin-top:8px">Открой игру из ВК — иначе в ленту не уйдёт.</div>');return}
     if(!y||!y.leaderboards){box.innerHTML=H+'<div class="muted">Таблица лидеров работает в Яндекс Играх. Ваши очки: <b>'+(SAVE.score||0).toLocaleString('ru-RU')+'</b>.</div>';return}
     box.innerHTML=H+'<div class="muted">Загружаем рейтинг…</div>';
     const r=await this.load();if(!$('lbBox'))return;
@@ -5108,9 +5169,9 @@ document.addEventListener('click',e=>{
     case 'afterresult':(async()=>{const wasB=STATE.result&&STATE.result.c.mode==='bonus';STATE.case=null;STATE.screen=wasB?'bonus':'menu';UI.render();await ADS.interstitial();maybeBonus();try{VKP.maybeAskNotifications()}catch(e){}})();break;
     case 'vknotif':(async()=>{if(VKP.notifOn()){UI.toast('Уведомления уже включены','green');return}const ok=await VKP.askNotifications(true);if(!ok)UI.toast('Разрешение не выдано — можно включить позже','red');UI.render()})();break;
     case 'shop':STATE.screen='shop';UI.render();break;case 'shoptab':STATE.shopTab=t.dataset.tab;UI.render();break;
-    case 'buy':{const f=shopItem(t.dataset.id);if(!f)break;if(SAVE.coins<f.it[2]){UI.toast('Не хватает монет','red');break}SAVE.coins-=f.it[2];SAVE.owned.push(f.it[0]);SAVE.skin[f.cat]=f.it[0];saveNow();SFX.ach();UI.toast('Куплено: '+f.it[1],'green');checkAch();UI.render();break}
+    case 'buy':{const f=shopItem(t.dataset.id);if(!f)break;if(SAVE.coins<f.it[2]){UI.toast('Не хватает монет','red');break}SAVE.coins-=f.it[2];SAVE.owned.push(f.it[0]);SAVE.skin[f.cat]=f.it[0];if(f.it[2]>0){SAVE.flags=SAVE.flags||{};SAVE.flags.boughtPaidSkin=true}saveNow();SFX.ach();UI.toast('Куплено: '+f.it[1],'green');checkAch();UI.render();break}
     case 'equip':{const f=shopItem(t.dataset.id);if(f&&isOwned(f.it[0])){SAVE.skin[f.cat]=f.it[0];save();UI.render()}break}
-    case 'mbuy':{const tr=findTrack(t.dataset.id);if(ownsMusic(tr.id))break;if(SAVE.coins<tr.price){UI.toast('Не хватает монет','red');break}SAVE.coins-=tr.price;SAVE.music.owned.push(tr.id);if(!SAVE.music.active.includes(tr.id))SAVE.music.active.push(tr.id);saveNow();SFX.ach();checkAch();UI.render();break}
+    case 'mbuy':{const tr=findTrack(t.dataset.id);if(ownsMusic(tr.id))break;if(SAVE.coins<tr.price){UI.toast('Не хватает монет','red');break}SAVE.coins-=tr.price;SAVE.music.owned.push(tr.id);if(!SAVE.music.active.includes(tr.id))SAVE.music.active.push(tr.id);if(tr.price>0){SAVE.flags=SAVE.flags||{};SAVE.flags.boughtPaidTrack=true}saveNow();SFX.ach();checkAch();UI.render();break}
     case 'mtrack':MUSIC.setTrack(t.dataset.id);if(!MUSIC.playing&&SAVE.settings.music)MUSIC.start();UI.render();break;
     case 'mtoggle':{const id=t.dataset.id,ac=SAVE.music.active,i=ac.indexOf(id);if(i>=0){if(ac.length<=1){UI.toast('В плейлисте должен остаться хотя бы один трек','red');break}ac.splice(i,1)}else ac.push(id);save();UI.render();break}
     case 'ach':case 'board':case 'archive':case 'settings':STATE.screen=a;UI.render();break;
