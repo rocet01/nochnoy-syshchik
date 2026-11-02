@@ -850,7 +850,6 @@ const VKM={
   ],
   points(){const md=SAVE.vkMissions||{};return this.defs.reduce((s,d)=>s+(md[d.key]?d.pts:0),0)},
   busy:Object.create(null),
-  _errToast:0,
   rememberFlags(r){
     if(!r)return;
     if(r.allEv&&r.tier!=='wrong')SAVE.flags.mission_all_evidence=true;
@@ -896,29 +895,10 @@ const VKM={
       if(data&&data.ok){
         if(!SAVE.vkMissionSent)SAVE.vkMissionSent={};
         SAVE.vkMissionSent[key]=Date.now();
-        SAVE.flags=SAVE.flags||{};
-        SAVE.flags.vkMissionLast='ok:'+key+(data.already?' (уже была)':'');
         if(SAVE.vkMissionQueue)SAVE.vkMissionQueue=SAVE.vkMissionQueue.filter(k=>k!==key);
         save();
-        try{UI.toast('В ленту VK: '+key+(data.already?' (уже была)':''),'green')}catch(e){}
-      }else{
-        this.queue(key);
-        const err=(data&&data.error);
-        const errTxt=typeof err==='object'?(err.error_msg||JSON.stringify(err)):String(err||res.status);
-        SAVE.flags=SAVE.flags||{};
-        SAVE.flags.vkMissionLast='err:'+errTxt;
-        save();
-        const now=Date.now();
-        if(now-this._errToast>12000){
-          this._errToast=now;
-          try{UI.toast('VK миссия не ушла: '+errTxt,'red')}catch(e){}
-        }
-      }
-    }catch(e){
-      this.queue(key);
-      SAVE.flags=SAVE.flags||{};SAVE.flags.vkMissionLast='err:'+String(e&&e.message||e);save();
-      try{UI.toast('VK миссия: сеть/Worker','red')}catch(e2){}
-    }
+      }else this.queue(key);
+    }catch(e){this.queue(key)}
     finally{this.busy[key]=false}
   },
   flushQueue(){
@@ -4910,8 +4890,8 @@ const LB={cache:null,t:0,
   async login(){const y=SDK.ready();if(!y||!y.auth)return;
     try{await y.auth.openAuthDialog();CLOUD.player=await y.getPlayer();CLOUD.ready=true;CLOUD.push(true);await this.push();this.t=0;if(STATE.screen==='board')UI.render()}catch(e){}},
   async paint(){const box=$('lbBox');if(!box)return;const y=SDK.ready(),H='<h3>Общий рейтинг сыщиков</h3>';
-    if(PLATFORM==='vk'){const md=SAVE.vkMissions||{},sent=SAVE.vkMissionSent||{},done=Object.keys(md).length,synced=Object.keys(sent).length,total=(VKM.defs||[]).length,last=(SAVE.flags&&SAVE.flags.vkMissionLast)||'—';
-      box.innerHTML='<h3>Сыщики среди друзей</h3><div class="muted">Лента друзей — не колокольчик «Уведомления», а раздел <b>Игры</b> (на телефоне) или <b>Игры → Профиль → Уведомления</b> (на сайте). В игре миссии: <b>'+done+'</b> из <b>'+total+'</b>. Ушло в VK: <b>'+synced+'</b>. Последняя отправка: <b>'+esc(String(last))+'</b>.</div>'+(SDK.vk?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm primary" data-act="vkinvite">Пригласить друзей</button><button class="btn sm" data-act="vkleader">Таблица VK</button><button class="btn sm" data-act="vkresync">Переслать в VK</button></div>':'<div class="muted" style="margin-top:8px">Открой игру из ВК — иначе в ленту не уйдёт.</div>');return}
+    if(PLATFORM==='vk'){const md=SAVE.vkMissions||{},done=Object.keys(md).length,total=(VKM.defs||[]).length;
+      box.innerHTML='<h3>Сыщики среди друзей</h3><div class="muted">Позовите друзей и копите миссии — их видно в ленте активности. Ваши очки: <b>'+(SAVE.score||0).toLocaleString('ru-RU')+'</b>. Миссии: <b>'+done+'</b> из <b>'+total+'</b>.</div>'+(SDK.vk?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm primary" data-act="vkinvite">Пригласить друзей</button><button class="btn sm" data-act="vkleader">Таблица VK</button></div>':'');return}
     if(!y||!y.leaderboards){box.innerHTML=H+'<div class="muted">Таблица лидеров работает в Яндекс Играх. Ваши очки: <b>'+(SAVE.score||0).toLocaleString('ru-RU')+'</b>.</div>';return}
     box.innerHTML=H+'<div class="muted">Загружаем рейтинг…</div>';
     const r=await this.load();if(!$('lbBox'))return;
